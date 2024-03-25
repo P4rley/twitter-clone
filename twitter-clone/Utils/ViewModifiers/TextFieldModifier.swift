@@ -7,12 +7,13 @@
 
 import SwiftUI
 
-struct TextFieldModifier: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+struct TextFieldModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .font(.subheadline)
+            .padding(12)
+        
+        Divider()
+            .padding(.horizontal, 12)
     }
-}
-
-#Preview {
-    TextFieldModifier()
 }

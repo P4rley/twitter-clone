@@ -12,15 +12,13 @@ enum Theme {
 }
 
 
-
-struct LoginView: View {
+struct HomeView: View {
     @Environment(\.colorScheme) var colorScheme
-    @State private var showBottomScreen = false
-    @State private var currentBottomScreen = ""
+    @State private var showBottomRegistrationScreen = false
+    @State private var showBottomLoginScreen = false
     
     var body: some View {
         let textColor: Color = colorScheme == .dark ? .white : .black
-        
         NavigationStack {
             ZStack {
                 Theme.primary.ignoresSafeArea()
@@ -34,7 +32,7 @@ struct LoginView: View {
                         .font(.largeTitle)
                     
                     Button {
-                        showBottomScreen.toggle()
+                        showBottomRegistrationScreen.toggle()
                     } label: {
                         Text("Create account")
                             .foregroundStyle(.white)
@@ -49,8 +47,8 @@ struct LoginView: View {
                     
                     Spacer()
                     
-                    NavigationLink {
-                        
+                    Button {
+                        showBottomLoginScreen.toggle()
                     } label: {
                         HStack(spacing: 3) {
                             Text("Already have an account?")
@@ -75,12 +73,20 @@ struct LoginView: View {
                     }
                 }
                 .fullScreenCover(
-                    isPresented: $showBottomScreen,
+                    isPresented: $showBottomRegistrationScreen,
                     onDismiss: {
-                        showBottomScreen = false
+                        showBottomRegistrationScreen = false
                     },
                     content: {
-                    RegistrationView()
+                       RegistrationView()
+                })
+                .fullScreenCover(
+                    isPresented: $showBottomLoginScreen,
+                    onDismiss: {
+                        showBottomLoginScreen = false
+                    },
+                    content: {
+                       LoginView()
                 })
             }
         }
@@ -88,5 +94,5 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginView()
+    HomeView()
 }
