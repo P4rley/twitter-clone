@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct RegistrationView: View {
+    
+    /// State
     @State private var name = ""
     @State private var email = ""
     @State private var dateOfBirth = ""
@@ -15,7 +17,7 @@ struct RegistrationView: View {
     @State private var isDateSelected: Bool = false
     @State private var isDatePickerVisible = false
     
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    /// Environment
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -27,74 +29,50 @@ struct RegistrationView: View {
                     .padding(12)
                     
                 
-                TextField("Name", text: $name)
-                    .textInputAutocapitalization(.never)
-                    .modifier(TextFieldModifier())
+                TextInputField("Name", text: $name)
                     .onTapGesture {
                         self.isDatePickerVisible = false
+                        self.hideKeyboard()
                     }
-
                 
-                TextField("Email", text: $email)
-                    .textInputAutocapitalization(.never)
-                    .modifier(TextFieldModifier())
+                TextInputField("Email", text: $email)
                     .onTapGesture {
                         self.isDatePickerVisible = false
+                        self.hideKeyboard()
                     }
                 
-                
-                
-                VStack {
-                    
-                    TextField(isDateSelected ? formatDate(date: selectedDate ?? Date()) : "Date of birth", text: $dateOfBirth)
-                        .modifier(TextFieldModifier())
-                        .disabled(self.isDatePickerVisible)
-                        .onTapGesture {
-                            self.isDatePickerVisible.toggle()
-                            //this line will do magic to hide keyboard
-                            self.hideKeyboard()
-                        }
-                    
-                    HStack() {
-                        Spacer()
-                        
-                        Button {
-                            print("DEBUG: LOGIN")
-                        } label: {
-                            Text("Next")
-                                .padding(.horizontal)
-                                .padding(.vertical, 8)
-                                .background(.black)
-                                .cornerRadius(20)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(.white)
-                                .opacity(name.isEmpty || email.isEmpty || dateOfBirth.isEmpty ? 0.5 : 1.0)
-                                .disabled(name.isEmpty || email.isEmpty || dateOfBirth.isEmpty)
-                        }
-                        .padding()
+                TextInputField("Date of birth", text: $dateOfBirth)
+                    .disabled(self.isDatePickerVisible)
+                    .onTapGesture {
+                        self.isDatePickerVisible.toggle()
+                        self.hideKeyboard()
                     }
-                    
-                    
-                    
-                    if isDatePickerVisible {
-                        DatePicker("", selection: Binding<Date>(get: {
-                            self.selectedDate ?? Date()
-                        }, set: { newValue in
-                            self.selectedDate = newValue
-                            self.dateOfBirth = formatDate(date: self.selectedDate!)
-                            self.isDateSelected = newValue != nil
-                        }), displayedComponents: .date)
-                        .datePickerStyle(GraphicalDatePickerStyle())
-                        .labelsHidden()
-                        .frame(width: 320, height: 320)
-                        .onDisappear {
-                            self.isDatePickerVisible = false
-                        }
+                    .onDisappear {
+                        self.isDatePickerVisible = false
                     }
-                }
-                
                 
                 Spacer()
+                
+                HStack(alignment: .center) {
+                    Spacer()
+                    
+                    Button {
+                        print("DEBUG: \(name), \(email), \(isDatePickerVisible)")
+                    } label: {
+                        Text("Next")
+                            .foregroundStyle(.white)
+                            .font(.headline)
+                            .padding(.horizontal)
+                            .padding(.vertical, 10)
+                            .background(Color.black)
+                            .cornerRadius(24)
+                    }
+                }
+                .padding()
+                
+                if isDatePickerVisible {
+                    DatePickerField("Date of birth", text: $dateOfBirth)
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading){
@@ -122,3 +100,5 @@ struct RegistrationView: View {
 #Preview {
     RegistrationView()
 }
+
+

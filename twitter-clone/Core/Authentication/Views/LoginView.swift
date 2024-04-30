@@ -19,15 +19,11 @@ struct LoginView: View {
                     .font(.system(size: 36))
                     .fontWeight(.bold)
                 
-                VStack {
-                    TextField("Email", text: $email)
-                        .textInputAutocapitalization(.never)
-                        .modifier(TextFieldModifier())
-                    
-                    SecureField("Password", text: $password)
-                        .textInputAutocapitalization(.never)
-                        .modifier(TextFieldModifier())
-                }
+                
+                
+                TextInputField("Email", text: $email)
+                
+                SecureInputField("Password", text: $password)
                 
                 Spacer()
                 
@@ -39,8 +35,9 @@ struct LoginView: View {
                         Text("Forgot password?")
                     }
                     
+                    
                     Button {
-                        
+                      
                     } label: {
                         Text("Login")
                             .padding(.horizontal)
@@ -70,3 +67,6 @@ struct LoginView: View {
 #Preview {
     LoginView()
 }
+
+
+

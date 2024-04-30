@@ -7,11 +7,6 @@
 
 import SwiftUI
 
-enum Theme {
-    static let primary = Color("Primary")
-}
-
-
 struct HomeView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var showBottomRegistrationScreen = false
@@ -21,7 +16,6 @@ struct HomeView: View {
         let textColor: Color = colorScheme == .dark ? .white : .black
         NavigationStack {
             ZStack {
-                Theme.primary.ignoresSafeArea()
                 VStack {
                     
                     Spacer()
