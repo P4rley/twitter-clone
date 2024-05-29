@@ -10,12 +10,13 @@ import SwiftUI
 struct RegistrationView: View {
     
     /// State
-    @State private var name = ""
-    @State private var email = ""
-    @State private var dateOfBirth = ""
+    @StateObject var viewModel = RegistrationViewModel()
     @State private var selectedDate: Date? = nil
     @State private var isDateSelected: Bool = false
     @State private var isDatePickerVisible = false
+    @State private var showAlert = false
+    @State private var errorMessage = ""
+    @State private var isLoading = false
     
     /// Environment
     @Environment(\.dismiss) var dismiss
@@ -27,21 +28,21 @@ struct RegistrationView: View {
                     .font(.system(size: 36))
                     .fontWeight(.bold)
                     .padding(12)
-                    
                 
-                TextInputField("Name", text: $name)
+                
+                TextInputField("Full Name", text: $viewModel.fullname)
                     .onTapGesture {
                         self.isDatePickerVisible = false
                         self.hideKeyboard()
                     }
                 
-                TextInputField("Email", text: $email)
+                TextInputField("Email", text: $viewModel.email)
                     .onTapGesture {
                         self.isDatePickerVisible = false
                         self.hideKeyboard()
                     }
                 
-                TextInputField("Date of birth", text: $dateOfBirth)
+                TextInputField("Date of birth", text: $viewModel.dateOfBirth)
                     .disabled(self.isDatePickerVisible)
                     .onTapGesture {
                         self.isDatePickerVisible.toggle()
@@ -51,28 +52,62 @@ struct RegistrationView: View {
                         self.isDatePickerVisible = false
                     }
                 
+                SecureInputField("Password", text: $viewModel.password)
+                    .onTapGesture {
+                        self.isDatePickerVisible = false
+                        self.hideKeyboard()
+                    }
+                
                 Spacer()
                 
                 HStack(alignment: .center) {
                     Spacer()
                     
                     Button {
-                        print("DEBUG: \(name), \(email), \(isDatePickerVisible)")
+                        Task {
+                            isLoading = true
+                            
+                            do {
+                                try await viewModel.createUser()
+                                
+                                dismiss()
+                            } catch {
+                                errorMessage = error.localizedDescription
+                                showAlert = true
+                            }
+                            
+                            isLoading = false
+                        }
                     } label: {
-                        Text("Next")
-                            .foregroundStyle(.white)
-                            .font(.headline)
-                            .padding(.horizontal)
-                            .padding(.vertical, 10)
-                            .background(Color.black)
-                            .cornerRadius(24)
+                        if isLoading {
+                            ProgressView()
+                                .padding(.horizontal, 38 )
+                                .padding(.vertical, 10)
+                                .background(Color.blue)
+                                .cornerRadius(24)
+                                .tint(.white)
+                        } else {
+                            Text("Sign Up")
+                                .foregroundStyle(.white)
+                                .font(.headline)
+                                .padding(.horizontal)
+                                .padding(.vertical, 10)
+                                .background(Color.blue)
+                                .cornerRadius(24)
+                                .opacity(viewModel.fullname.isEmpty || viewModel.email.isEmpty || viewModel.dateOfBirth.isEmpty || viewModel.password.isEmpty ? 0.5 : 1)
+                        }
                     }
+                    
+                    .disabled(viewModel.fullname.isEmpty || viewModel.email.isEmpty || viewModel.dateOfBirth.isEmpty || viewModel.password.isEmpty)
                 }
                 .padding()
                 
                 if isDatePickerVisible {
-                    DatePickerField("Date of birth", text: $dateOfBirth)
+                    DatePickerField("Date of birth", text: $viewModel.dateOfBirth)
                 }
+            }
+            .alert(isPresented: $showAlert) {
+                Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading){
@@ -83,7 +118,9 @@ struct RegistrationView: View {
                     }
                 }
             }
-        }}
+        }
+        
+    }
     
     // Helper method to format date to string
         func formatDate(date: Date) -> String {

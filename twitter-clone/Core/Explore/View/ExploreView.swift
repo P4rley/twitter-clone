@@ -10,130 +10,177 @@ import SwiftUI
 
 struct ExploreView: View {
     @Binding var showMenu: Bool
+    
+    @State private var selectedFilter: ExploreTabModel.Tab = .trending
+    @State private var mainViewScrollState: ExploreTabModel.Tab? = .trending
+    @State private var tabBarScrollState: ExploreTabModel.Tab? = .trending
+    
+    @State private var tabs: [ExploreTabModel] = [
+        .init(id: ExploreTabModel.Tab.trending),
+        .init(id: ExploreTabModel.Tab.following),
+        .init(id: ExploreTabModel.Tab.news),
+        .init(id: ExploreTabModel.Tab.sports),
+        .init(id: ExploreTabModel.Tab.entertaiment),
+    ]
+    
     var body: some View {
         NavigationStack {
-            ExploreToolbar(showMenu: $showMenu)
+            ExploreToolbar(showMenu: $showMenu, selectedFilter: $selectedFilter, mainViewScrollState: $mainViewScrollState, tabBarScrollState: $tabBarScrollState)
             
-            ScrollView(.vertical, showsIndicators: false)  {
-                LazyVStack(pinnedViews: [.sectionHeaders]) {
-                    
-                    Section(header:
-                        HStack(alignment: .firstTextBaseline ) {
-                            Text("Trends for you")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .zIndex(1.0)
-                                .padding(.vertical, 10)
-                        
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        .background(Color.white)
-                            
-                    ) {
-                        ForEach(1...5, id: \.self) { count in
-                            ExploreCell()
-                            
-                            if count != 5 {
-                                Divider()
-                                
-                            }
-                            
-                        }
-                        
-                        
-                        Button {
-                            
-                        } label: {
-                            HStack {
-                                Text("Show more")
-                                    .foregroundStyle(.link)
-                                
-                                Spacer()
-                                
-                                Image(systemName: "chevron.right")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 14, height: 14)
-                                    .foregroundStyle(Color(.systemGray4))
-                            }
-                            .padding(.horizontal)
-                            .padding(.top, 5)
-                        }
-                        
-                        Divider()
-                        
-                        VStack(alignment: .leading) {
-                            HStack {
-                                Text("Videos for you")
-                                    .font(.title2)
-                                    .fontWeight(.bold)
-                                    .zIndex(1.0)
-                                    .padding(.top, 10)
-                                
-                                
-                                Spacer()
-                            }
-                            
-                                                        
-                            
-                            Text("Check out these popular and trending video for you")
-                                .font(.footnote)
-                                .foregroundStyle(Color(.gray))
-                            
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(alignment: .firstTextBaseline, spacing: 10) {
-                                    ForEach(0...10, id: \.self) { _ in
+            GeometryReader {
+                let size = $0.size
+                
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHStack(spacing: 0) {
+                        ForEach(tabs) {explore in
+                            ScrollView(.vertical, showsIndicators: false)  {
+                                LazyVStack(pinnedViews: [.sectionHeaders]) {
+                                    
+                                    Section(header:
+                                        HStack(alignment: .firstTextBaseline ) {
+                                            Text("Trends for you")
+                                                .font(.title2)
+                                                .fontWeight(.bold)
+                                                .zIndex(1.0)
+                                                .padding(.vertical, 10)
+                                        
+                                            Spacer()
+                                        }
+                                        .padding(.horizontal)
+                                        .background(Color.white)
+                                            
+                                    ) {
+                                        ForEach(1...5, id: \.self) { count in
+                                            ExploreCell()
+                                            
+                                            if count != 5 {
+                                                Divider()
+                                                
+                                            }
+                                            
+                                        }
+                                        
+                                        
                                         Button {
                                             
                                         } label: {
-                                            Image("sample-image")
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 140, height: 180)
-                                                .cornerRadius(10)
-                                                .overlay(
-                                                    Image(systemName: "arrowtriangle.forward.fill")
-                                                        .font(.title2)
-                                                        .fontWeight(.ultraLight)
-                                                        .foregroundStyle(.white)
-                                                        .padding(15)
-                                                        .background(
-                                                            Circle()
-                                                                .fill(Color.black.opacity(0.35))
-                                                        )
-                                                    
-                                                )
-
+                                            HStack {
+                                                Text("Show more")
+                                                    .foregroundStyle(.link)
+                                                
+                                                Spacer()
+                                                
+                                                Image(systemName: "chevron.right")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 14, height: 14)
+                                                    .foregroundStyle(Color(.systemGray4))
+                                            }
+                                            .padding(.horizontal)
+                                            .padding(.top, 5)
                                         }
+                                        
+                                        Divider()
+                                        
+                                        VStack(alignment: .leading) {
+                                            HStack {
+                                                Text("Videos for you")
+                                                    .font(.title2)
+                                                    .fontWeight(.bold)
+                                                    .zIndex(1.0)
+                                                    .padding(.top, 10)
+                                                
+                                                
+                                                Spacer()
+                                            }
+                                            
+                                                                        
+                                            
+                                            Text("Check out these popular and trending video for you")
+                                                .font(.footnote)
+                                                .foregroundStyle(Color(.gray))
+                                            
+                                            ScrollView(.horizontal, showsIndicators: false) {
+                                                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                                                    ForEach(0...10, id: \.self) { _ in
+                                                        Button {
+                                                            
+                                                        } label: {
+                                                            Image("sample-image")
+                                                                .resizable()
+                                                                .scaledToFill()
+                                                                .frame(width: 140, height: 180)
+                                                                .cornerRadius(10)
+                                                                .overlay(
+                                                                    Image(systemName: "arrowtriangle.forward.fill")
+                                                                        .font(.title2)
+                                                                        .fontWeight(.ultraLight)
+                                                                        .foregroundStyle(.white)
+                                                                        .padding(15)
+                                                                        .background(
+                                                                            Circle()
+                                                                                .fill(Color.black.opacity(0.35))
+                                                                        )
+                                                                    
+                                                                )
+
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            
+                                        }
+                                        .padding(.horizontal)
+                                        .padding(.bottom)
+                                        .background(Color.white)
                                     }
                                 }
+                                .frame(width: size.width)
                             }
-                            
+                            .refreshable {
+                                print("DEBUG: REFRESH")
+                            }
                         }
-                        .padding(.horizontal)
-                        .padding(.bottom)
-                        .background(Color.white)
                     }
+                    .scrollTargetLayout()
                 }
+                .scrollPosition(id: $mainViewScrollState)
+                .scrollTargetBehavior(.paging)
+                .onChange(of: mainViewScrollState, { oldValue, newValue in
+                    if let newValue {
+                        withAnimation(.snappy) {
+                            tabBarScrollState = newValue
+                            selectedFilter = newValue
+                        }
+                    }
+                })
             }
-            .refreshable {
-                print("DEBUG: REFRESH")
-            }
+            
         }
     }
 }
 
 struct ExploreToolbar: View {
-    @State private var selectedFilter: ExploreFilter = .forYou
+    
     @Namespace var animation
     @Binding var showMenu: Bool
+    @Binding var selectedFilter: ExploreTabModel.Tab
+    @Binding var mainViewScrollState: ExploreTabModel.Tab?
+    @Binding var tabBarScrollState: ExploreTabModel.Tab?
     
     private var filterBarWidth: CGFloat {
-        let count = CGFloat(FeedFilter.allCases.count)
+        let count = CGFloat(ExploreTabModel.Tab.allCases.count)
         
-        return UIScreen.main.bounds.width / count - 170
+        return UIScreen.main.bounds.width / count - 30
     }
+    
+    @State private var tabs: [ExploreTabModel] = [
+        .init(id: ExploreTabModel.Tab.trending),
+        .init(id: ExploreTabModel.Tab.following),
+        .init(id: ExploreTabModel.Tab.news),
+        .init(id: ExploreTabModel.Tab.sports),
+        .init(id: ExploreTabModel.Tab.entertaiment),
+    ]
     
     
     var body: some View {
@@ -153,22 +200,24 @@ struct ExploreToolbar: View {
                 Button {
                     
                 } label: {
-                    RoundedRectangle(cornerRadius: 25)
-                        .fill(Color(.systemGray4))
-                        .frame(height: 40)
-                        .frame(maxWidth: .infinity)
-                        .overlay(
-                            HStack(alignment: .center, spacing: 5) {
-                                Image(systemName: "magnifyingglass")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 20, height: 20)
-                                    .foregroundStyle(Color(.darkGray))
-                                
-                                Text("Search")
-                                    .foregroundStyle(Color(.darkGray))
-                            }
-                        )
+                    NavigationLink(destination: ExploreSearchView()) {
+                        RoundedRectangle(cornerRadius: 25)
+                            .fill(Color(.systemGray5))
+                            .frame(height: 40)
+                            .frame(maxWidth: .infinity)
+                            .overlay(
+                                HStack(alignment: .center, spacing: 5) {
+                                    Image(systemName: "magnifyingglass")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 20, height: 20)
+                                        .foregroundStyle(Color(.darkGray))
+                                    
+                                    Text("Search")
+                                        .foregroundStyle(Color(.darkGray))
+                                }
+                            )
+                    }
                 }
                 
                 Spacer()
@@ -188,16 +237,15 @@ struct ExploreToolbar: View {
             ScrollViewReader { scrollView in
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .center, spacing: filterBarWidth) {
-                        ForEach(ExploreFilter.allCases) { explore in
+                        ForEach(tabs) { explore in
                             VStack {
-                                Text(explore.title)
+                                Text(explore.id.rawValue)
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
                                     .foregroundStyle(Color(.black))
-                                    .opacity(selectedFilter == explore ? 1 : 0.5)
-                                    .id(explore.title)
+                                    .opacity(selectedFilter == explore.id ? 1 : 0.5)
                                 
-                                if selectedFilter == explore {
+                                if selectedFilter == explore.id {
                                     Rectangle()
                                         .foregroundStyle(Color(.black))
                                         .frame(height: 3)
@@ -209,9 +257,11 @@ struct ExploreToolbar: View {
                                 }
                             }
                             .onTapGesture {
-                                withAnimation(.linear(duration: 0.3)) {
-                                    selectedFilter = explore
-                                    scrollView.scrollTo(explore.title, anchor: .center)
+                                withAnimation(.snappy(duration: 0.3)) {
+                                    mainViewScrollState = explore.id
+                                    tabBarScrollState = explore.id
+                                    selectedFilter = explore.id
+                                    scrollView.scrollTo(explore.id, anchor: .center)
                                 }
                             }
                         }
@@ -219,10 +269,13 @@ struct ExploreToolbar: View {
                     .padding(.horizontal)
                     .padding(.top, 20)
                 }
+                .scrollPosition(id: .init(get: {
+                    return tabBarScrollState
+                }, set: { _ in
+                }), anchor: .center)
             }
             
         }
-        
         .overlay (
             Rectangle()
                 .frame(width: UIScreen.main.bounds.width, height: 1)

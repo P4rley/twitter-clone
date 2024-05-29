@@ -8,8 +8,12 @@
 import SwiftUI
 
 struct LoginView: View {
-    @State private var email = ""
-    @State private var password = ""
+    @StateObject var viewModel = LoginViewModel()
+    
+    @State private var showAlert = false
+    @State private var errorMessage = ""
+    @State private var isLoading = false
+    
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -21,9 +25,9 @@ struct LoginView: View {
                 
                 
                 
-                TextInputField("Email", text: $email)
+                TextInputField("Email", text: $viewModel.email)
                 
-                SecureInputField("Password", text: $password)
+                SecureInputField("Password", text: $viewModel.password)
                 
                 Spacer()
                 
@@ -37,19 +41,41 @@ struct LoginView: View {
                     
                     
                     Button {
-                      
-                    } label: {
-                        Text("Login")
-                            .padding(.horizontal)
-                            .padding(.vertical, 8)
-                            .background(.black)
-                            .cornerRadius(20)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.white)
+                        Task {
+                            isLoading = true
                             
+                            do {
+                                try await viewModel.login()
+                            } catch {
+                                errorMessage = error.localizedDescription
+                                showAlert = true
+                            }
+                            
+                            isLoading = false
+                        }
+                    } label: {
+                        if isLoading {
+                            ProgressView()
+                                .padding(.horizontal, 15)
+                                .padding(.vertical, 10)
+                                .background(Color.blue)
+                                .cornerRadius(24)
+                                .tint(.white)
+                        } else {
+                            Text("Login")
+                                .padding(.horizontal)
+                                .padding(.vertical, 8)
+                                .background(Color.blue)
+                                .cornerRadius(20)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.white)
+                        }
                     }
                 }
                 .padding(.bottom)
+            }
+            .alert(isPresented: $showAlert) {
+                Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading){

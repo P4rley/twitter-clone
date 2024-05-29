@@ -7,28 +7,43 @@
 
 import Foundation
 
-enum ExploreFilter: Int, CaseIterable, Identifiable {
-    case forYou
-    case trending
-    case news
-    case sports
-    case entertaiment
+struct ExploreTabModel: Identifiable {
+    private(set) var id: Tab
     
-    var title: String {
-        switch self {
-        case .forYou:
-            return "For You"
-        case .trending:
-            return "Trending"
-        case .news:
-            return "News"
-        case .sports:
-            return "Sports"
-        case .entertaiment:
-            return "Entertaiment"
-
-        }
+    var size: CGSize = .zero
+    var minX: CGFloat = .zero
+    
+    enum Tab: String, CaseIterable {
+        case trending = "Trending"
+        case following = "Following"
+        case news = "News"
+        case sports = "Sports"
+        case entertaiment = "Entertaiment"
     }
-    
-    var id: Int { return self.rawValue }
 }
+
+//enum ExploreFilter: Int, CaseIterable, Identifiable {
+//    case forYou
+//    case trending
+//    case news
+//    case sports
+//    case entertaiment
+//    
+//    var title: String {
+//        switch self {
+//        case .forYou:
+//            return "For You"
+//        case .trending:
+//            return "Trending"
+//        case .news:
+//            return "News"
+//        case .sports:
+//            return "Sports"
+//        case .entertaiment:
+//            return "Entertaiment"
+//
+//        }
+//    }
+//    
+//    var id: Int { return self.rawValue }
+//}

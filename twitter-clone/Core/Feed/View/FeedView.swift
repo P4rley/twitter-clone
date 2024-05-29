@@ -10,6 +10,9 @@ import SwiftUI
 struct FeedView: View {
     
     @Namespace var animation
+    @State private var selectedFilter: FeedTabModel.Tab = .forYou
+    @State private var mainViewScrollState: FeedTabModel.Tab? = .forYou
+    @State private var tabBarScrollState: FeedTabModel.Tab? = .forYou
     
     @State private var scrollViewOffset: CGFloat = 0
     @State private var isToolbarHidden = false
@@ -17,53 +20,97 @@ struct FeedView: View {
     @State private var opacity: Double = 0.0
     @State var hideNavigationBar: Bool = false
     
+    @GestureState var gestureOffset: CGFloat = 0
+    
     @StateObject var headerData = HeaderViewModel()
     
-    @Binding var showMenu: Bool
+    @State private var tabs: [FeedTabModel] = [
+        .init(id: FeedTabModel.Tab.forYou),
+        .init(id: FeedTabModel.Tab.following),
+    ]
     
+    @Binding var showMenu: Bool
     
     var body: some View {
         NavigationStack {
             ZStack(alignment: .top) {
-
-                Toolbar(showMenu: $showMenu)
+                
+                Toolbar(showMenu: $showMenu, selectedFilter: $selectedFilter, mainViewScrollState: $mainViewScrollState, tabBarScrollState: $tabBarScrollState)
                     .offset(y: tabState == .visible ? 0 : -200)
                     .animation(.easeInOut(duration: 0.3), value: tabState)
                     .zIndex(1)
-                    
                 
-                ToolbarScrollView(axis: .vertical, showIndicator: true, tabState: $tabState) {
-                    LazyVStack {
-                        ForEach(0...10, id: \.self) { _ in
-                            FeedCell()
+//                ToolbarScrollView(axis: .vertical, showIndicator: true, tabState: $tabState) {
+//                    ForEach(0...10, id: \.self) { _ in
+//                        FeedCell()
+//                    }
+//                }
+//                .padding(.top, tabState == .visible ? 75 : 0)
+//                .animation(.easeInOut(duration: 0.3), value: tabState)
+//                .refreshable {
+//                    print("DEBUG: REFRESH")
+//                }
+                GeometryReader {
+                    let size = $0.size
+                    
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        LazyHStack(spacing: 0) {
+                            ForEach(tabs) {profile in
+                                ToolbarScrollView(axis: .vertical, showIndicator: true, tabState: $tabState) {
+                                    ForEach(0...10, id: \.self) { _ in
+                                        FeedCell()
+                                            .frame(width: size.width)
+                                    }
+                                }                                
+                                .padding(.top, tabState == .visible ? 75 : 0)
+                                .animation(.easeInOut(duration: 0.3), value: tabState)
+                                .refreshable {
+                                    print("DEBUG: REFRESH")
+                                }
+                            }
                         }
+                        .scrollTargetLayout()
                     }
-                }
-                .padding(.top, tabState == .visible ? 75 : 0)
-                .animation(.easeInOut(duration: 0.3), value: tabState)
-                .refreshable {
-                    print("DEBUG: REFRESH")
+                    .padding(.top, tabState == .visible ? 55 : 0)
+                    .ignoresSafeArea(.all)
+                    .scrollPosition(id: $mainViewScrollState)
+                    .scrollTargetBehavior(.paging)
+                    .onChange(of: mainViewScrollState, { oldValue, newValue in
+                        if let newValue {
+                            withAnimation(.snappy) {
+                                tabBarScrollState = newValue
+                                selectedFilter = newValue
+                            }
+                        }
+                    })
+
                 }
             }
         }
-       
+        
     }
-    
 }
 
-
 #Preview {
-    FeedView(showMenu: .constant(false))
+    ContentView()
 }
 
 struct Toolbar: View {
-    @State private var selectedFilter: FeedFilter = .forYou
+    
     @Namespace var animation
     @State private var scrollOffset: CGFloat = 0
     @Binding var showMenu: Bool
+    @Binding var selectedFilter: FeedTabModel.Tab
+    @Binding var mainViewScrollState: FeedTabModel.Tab?
+    @Binding var tabBarScrollState: FeedTabModel.Tab?
+    
+    @State private var tabs: [FeedTabModel] = [
+        .init(id: FeedTabModel.Tab.forYou),
+        .init(id: FeedTabModel.Tab.following),
+    ]
     
     private var filterBarWidth: CGFloat {
-        let count = CGFloat(FeedFilter.allCases.count)
+        let count = CGFloat(FeedTabModel.Tab.allCases.count)
         
         return UIScreen.main.bounds.width / count - 50
     }
@@ -102,16 +149,16 @@ struct Toolbar: View {
             .foregroundColor(.primary)
             
             HStack(alignment: .center, spacing: filterBarWidth) {
-                ForEach(FeedFilter.allCases) { filter in
+                ForEach(tabs) { filter in
                     
                     VStack {
-                        Text(filter.title)
+                        Text(filter.id.rawValue)
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundStyle(Color(.black))
-                            .opacity(selectedFilter == filter ? 1 : 0.5)
+                            .opacity(selectedFilter == filter.id ? 1 : 0.5)
                         
-                        if selectedFilter == filter {
+                        if selectedFilter == filter.id {
                             Rectangle()
                                 .foregroundStyle(Color(.black))
                                 .frame(height: 3)
@@ -121,13 +168,13 @@ struct Toolbar: View {
                                 .foregroundStyle(.clear)
                                 .frame(height: 3)
                         }
-                        
-                        
                     }
                     .fixedSize()
                     .onTapGesture {
-                        withAnimation(.linear(duration: 0.3)) {
-                            selectedFilter = filter
+                        withAnimation(.snappy(duration: 0.3)) {
+                            selectedFilter = filter.id
+                            mainViewScrollState = filter.id
+                            tabBarScrollState = filter.id
                         }
                     }
                 }
@@ -154,5 +201,6 @@ struct ScrollViewOffsetKey: PreferenceKey {
         value = nextValue()
     }
 }
+
 
 

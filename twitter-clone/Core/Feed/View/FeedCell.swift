@@ -92,7 +92,7 @@ struct FeedCell: View {
                     .opacity(0.5)
                 }
             }
-            .padding()
+            .padding(.vertical)
             .overlay (
                 Rectangle()
                     .frame(width: UIScreen.main.bounds.width, height: 1)
@@ -101,6 +101,7 @@ struct FeedCell: View {
             )
 
         }
+        .padding(.horizontal)
     }
 }
 

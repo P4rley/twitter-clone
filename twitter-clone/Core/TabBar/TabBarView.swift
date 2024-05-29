@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct TabBarView: View {
-    @State private var selectedTab = 0
+    @Binding var selectedTab: Int
     @Binding var showMenu: Bool
+    
     var body: some View {
         TabView(selection: $selectedTab) {
             Group {
@@ -18,14 +19,18 @@ struct TabBarView: View {
                         Image(systemName: selectedTab == 0 ? "house.fill" : "house")
                             .environment(\.symbolVariants, selectedTab == 0 ? .fill : .none)
                     }
-                    .onAppear { selectedTab = 0 }
+                    .onAppear {
+                        selectedTab = 0
+                    }
                     .tag(0)
                 
                 ExploreView(showMenu: $showMenu)
                     .tabItem {
                         Image(systemName: "magnifyingglass")
                     }
-                    .onAppear { selectedTab = 1 }
+                    .onAppear {
+                        selectedTab = 1
+                    }
                     .tag(1)
                 
                 CommunitiesView()
@@ -33,7 +38,9 @@ struct TabBarView: View {
                         Image(systemName: selectedTab == 2 ? "person.2.fill" : "person.2")
                             .environment(\.symbolVariants, selectedTab == 2 ? .fill : .none)
                     }
-                    .onAppear { selectedTab = 2 }
+                    .onAppear {
+                        selectedTab = 2
+                    }
                     .tag(2)
                 
                 NotificationsView()
@@ -41,7 +48,9 @@ struct TabBarView: View {
                         Image(systemName: selectedTab == 3 ? "bell.fill" : "bell")
                             .environment(\.symbolVariants, selectedTab == 3 ? .fill : .none)
                     }
-                    .onAppear { selectedTab = 3 }
+                    .onAppear {
+                        selectedTab = 3
+                    }
                     .tag(3)
                 
                 MessagesView()
@@ -49,7 +58,9 @@ struct TabBarView: View {
                         Image(systemName: selectedTab == 4 ? "envelope.fill" : "envelope")
                             .environment(\.symbolVariants, selectedTab == 4 ? .fill : .none)
                     }
-                    .onAppear { selectedTab = 4 }
+                    .onAppear {
+                        selectedTab = 4
+                    }
                     .tag(4)
             }
         }
@@ -58,5 +69,5 @@ struct TabBarView: View {
 }
 
 #Preview {
-    TabBarView(showMenu: .constant(false))
+    TabBarView(selectedTab: .constant(0), showMenu: .constant(false))
 }
